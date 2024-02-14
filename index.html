@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGPT Integration Example</title>
+</head>
+<body>
+    <h1>Welcome to Our ChatGPT-Powered Website!</h1>
+    <p>This is a simple example of how you can integrate ChatGPT into a website.</p>
+    <div id="chat-interface">
+        <div id="chat-output" style="height: 300px; overflow: auto; border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;"></div>
+        <input type="text" id="user-input" placeholder="Ask something..." style="width: 70%; padding: 10px; margin-right: 10px;">
+        <button onclick="sendQuestion()" style="padding: 10px;">Ask</button>
+    </div>
+    <script>
+        const api_key = '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'; // 실제 API 키로 교체하세요.
+        const endpoint = 'https://api.openai.com/v1/engines/davinci/completions';
+
+        async function askChatGPT(question) {
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${api_key}`
+                },
+                body: JSON.stringify({
+                    prompt: question,
+                    max_tokens: 50
+                })
+            });
+
+            const data = await response.json();
+            return data.choices[0].text.trim();
+        }
+
+        function sendQuestion() {
+            const userInput = document.getElementById('user-input');
+            const chatOutput = document.getElementById('chat-output');
+            const question = userInput.value;
+            userInput.value = ''; // 입력 필드 초기화
+
+            if (question.trim() !== '') {
+                const userQuestion = document.createElement('div');
+                userQuestion.textContent = `You: ${question}`;
+                chatOutput.appendChild(userQuestion);
+
+                askChatGPT(question).then(response => {
+                    const chatGPTResponse = document.createElement('div');
+                    chatGPTResponse.textContent = `ChatGPT: ${response}`;
+                    chatOutput.appendChild(chatGPTResponse);
+
+                    // 스크롤을 최신 메시지 위치로 이동
+                    chatOutput.scrollTop = chatOutput.scrollHeight;
+                });
+            }
+        }
+    </script>
+</body>
+</html>
